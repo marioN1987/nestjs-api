@@ -4,22 +4,27 @@ import { AppService } from './app.service';
 import { StreamingModule } from './streaming_content/streamingContent.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { StreamingContentEntity } from './streaming_content/streamingContent.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'mario890',
-      database: 'zenith_db',
-      entities: [StreamingContentEntity],
-      synchronize: true,
-      logging: true,
-      logger: 'advanced-console'
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
+    TypeOrmModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+          type: configService.get<'mysql'>('DB_CONNECTION'),
+          host: configService.get<string>('DB_HOST'),
+          port: Number(configService.get('DB_PORT')),
+          username: configService.get<string>('DB_USERNAME'),
+          password: configService.get<string>('DB_PASSWORD'),
+          database: configService.get<string>('DB_DATABASE'),
+          synchronize: true,
+          logging: true,
+          logger: 'advanced-console',
+      }),
+      inject: [ConfigService],
     }),
-    StreamingModule],
+    StreamingModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
