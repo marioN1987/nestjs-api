@@ -2,8 +2,8 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('streaming_content')
 export class StreamingContentEntity {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
     @Column()
     title: string;
@@ -17,24 +17,24 @@ export class StreamingContentEntity {
     @Column()
     video_url: string;
 
-    @Column()
+    @Column({nullable: true})
     year: number;
 
     @Column()
     genre: string;
 
-    @Column()
+    @Column({ nullable: true })
     rating: number;
 
     @Column()
     duration: number;
 
-    @Column()
+    @Column({ nullable: true })
     cast: string;
 
-    @Column()
+    @Column({type: 'int', nullable: true })
     watch_progress?: number;
 
-    @Column()
-    created_at: string;
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    created_at: Date;
 }
