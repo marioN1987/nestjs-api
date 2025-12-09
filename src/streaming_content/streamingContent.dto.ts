@@ -1,41 +1,45 @@
-import { IsString, IsNumber, IsOptional, IsUrl, IsArray, IsDateString } from "class-validator";
+import { IsString, IsNumber, IsOptional, IsUrl, IsDateString, IsUUID, Length, maxLength, Max, Min, IsDate } from "class-validator";
+import type { UUID } from "crypto";
 
 export class StreamingContentDto {
-  @IsNumber()
-  id: number;
+  @IsUUID()
+  id: UUID;
 
-  @IsString()
+  @IsString({message: "Please enter valid title"})
   title: string;
 
-  @IsString()
+  @IsString({message: "Please enter valid description"})
   description: string;
 
-  @IsUrl()
+  @IsUrl({}, {message: "Invalid thumbnail url"})
   thumbnail_url: string;
 
-  @IsUrl()
+  @IsUrl({}, {message: "Invalid video url"})
   video_url: string;
 
+  @IsOptional()
   @IsNumber()
+  @Min(1920, { message: 'Year must be greater than 1920' })
+  @Max(2025, { message: 'Year must be smaller or equal to 2025' })
   year: number;
 
   @IsString()
   genre: string;
 
-  @IsNumber()
+  @IsOptional()
+  @IsNumber({}, { message: 'Rating must be a number' })
+  @Min(1, { message: 'Rating must be at least 1' })
+  @Max(5, { message: 'Rating cannot be more than 5' })
   rating: number;
 
-  @IsNumber()
+  @IsNumber({}, {message: "Duration must be number"})
   duration: number;
 
-  @IsArray()
-  @IsString({ each: true })
-  cast: string[];
+  @IsOptional()
+  @IsString()
+  cast: string;
 
   @IsOptional()
   @IsNumber()
   watch_progress?: number;
-
-  @IsDateString()
-  created_at: string;
 }
