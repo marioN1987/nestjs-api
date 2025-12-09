@@ -99,5 +99,5 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 ## Libaries installed
 
-npm install --save @nestjs/typeorm typeorm mysql2
-npm install class-validator class-transformer
+- npm install --save @nestjs/typeorm typeorm mysql2
+- npm install class-validator class-transformer
