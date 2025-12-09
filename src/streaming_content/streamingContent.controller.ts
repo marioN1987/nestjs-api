@@ -1,14 +1,15 @@
-import { Body, Controller, Get, Param, Post, Put, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete, UseGuards } from '@nestjs/common';
 import { StreamingContentService } from './streamingContent.service';
 import { StreamingContentDto } from './streamingContent.dto';
 import { StreamingContentEntity } from './streamingContent.entity';
+import type { UUID } from 'crypto';
 
 @Controller('api/streaming')
 export class StreamingContentController {
   constructor(private readonly streamingContentService: StreamingContentService) {}
 
   @Get()
-  async findAll(): Promise<StreamingContentEntity[]> {
+  getAll(): Promise<StreamingContentEntity[]> {
     return this.streamingContentService.findAll();
   }
 
@@ -17,18 +18,41 @@ export class StreamingContentController {
     return this.streamingContentService.findOne(params.id);
   }
 
-  @Post()
-  create(@Body() createStreamingContentDto: StreamingContentDto) {
-    return 'This action adds a new streaming';
+  @Post('create')
+  async create(@Body() data: StreamingContentDto) {
+    const exists = await this.streamingContentService.findOne(data.id);
+
+    if (exists) {
+      return "The provided id already exists";
+    }
+
+    const streamingCreated = await this.streamingContentService.create(data);
+
+    if (!streamingCreated) {
+      return { message: 'Streaming creation failed' };
+    }
+
+    return 'New streaming content created successfully';
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() updateStreamingDto: StreamingContentDto) {
-    return `This action updates a #${id} streaming`;
+  async update(@Param('id') id: UUID, @Body() updatedData: StreamingContentDto) {
+    const updated = await this.streamingContentService.update(id, updatedData);
+
+    console.log(updated);
+
+    if (!updated) {
+      return { message: `No content found with id ${id}` };
+    }
+
+    return {
+      message: 'Streaming content updated successfully',
+      content: updated,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  remove(@Param('id') id: UUID) {
     return this.streamingContentService.remove(id);
   }
 }
